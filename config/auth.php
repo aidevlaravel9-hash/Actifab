@@ -49,6 +49,14 @@ return [
             'driver' => 'session',
             'provider' => 'registrations',
         ],
+        'manager' => [
+            'driver' => 'session',
+            'provider' => 'manager_designer_users',
+        ],
+        'designer' => [
+            'driver' => 'session',
+            'provider' => 'manager_designer_users',
+        ],
     ],
 
     /*
@@ -76,6 +84,10 @@ return [
         'registrations' => [
             'driver' => 'eloquent',
             'model' => App\Models\Registration::class,
+        ],
+        'manager_designer_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\ManagerDesignerUser::class,
         ],
 
         // 'users' => [

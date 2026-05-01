@@ -8,6 +8,8 @@ use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\PanelController;
 use App\Http\Controllers\PanelDesignController;
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\ManagerAuthController;
+use App\Http\Controllers\DesignerAuthController;
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -346,17 +348,15 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('/admin/panel/section-list/{id}', [App\Http\Controllers\Admin\SubmitController::class, 'adminsectionFeederList'])->name('admin.panel.section.list');
     Route::post('/complete-project-panel/{id}', [App\Http\Controllers\Admin\SubmitController::class, 'completeProject'])->name('complete.project.panel');
 });
-//30042026
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('manager-designer-user', [App\Http\Controllers\Admin\ManagerDesignerUserController::class, 'index'])->name('manager-designer-user.index');
     Route::post('manager-designer-user/store', [App\Http\Controllers\Admin\ManagerDesignerUserController::class, 'store'])->name('manager-designer-user.store');
     Route::post('manager-designer-user/update', [App\Http\Controllers\Admin\ManagerDesignerUserController::class, 'update'])->name('manager-designer-user.update');
-    Route::delete('manager-designer-user/{id}', [App\Http\Controllers\Admin\ManagerDesignerUserController::class, 'destroy'])
+    Route::delete('manager-designer-user/{id?}', [App\Http\Controllers\Admin\ManagerDesignerUserController::class, 'destroy'])
         ->name('manager-designer-user.destroy');
     Route::get('manager-designer-user/edit/{id?}', [App\Http\Controllers\Admin\ManagerDesignerUserController::class, 'edit'])->name('manager-designer-user.edit');
+    Route::post('manager-designer-user/password-update', [App\Http\Controllers\Admin\ManagerDesignerUserController::class, 'passwordUpdate'])->name('manager-designer-user.password-update');
 });
-//30042026
-
 
 // Route::get('/dashboard', [PanelController::class, 'dashboard'])
 //     ->name('dashboard');
@@ -415,7 +415,7 @@ Route::middleware('auth:user')->group(function () {
     Route::post('/section/store', [PanelDesignController::class, 'storeSection'])
         ->name('section.store');
 
-    Route::get('/section/{id}/edit', [PanelDesignController::class, 'editSection'])
+    Route::get('/section/{id?}/edit', [PanelDesignController::class, 'editSection'])
         ->name('section.edit');
 
     Route::post('/section/{id}/update', [PanelDesignController::class, 'updateSection'])
@@ -445,19 +445,13 @@ Route::middleware('auth:user')->group(function () {
 // Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('forgot.password');
 
 Route::prefix('user')->name('user.')->middleware('auth:user')->group(function () {
-
     Route::get('/profile', [RegistrationController::class, 'getUserProfile'])
         ->name('detail');
-
     Route::post('/change-password', [RegistrationController::class, 'changePassword'])
         ->name('change-password');
-
     Route::post('/update-password', [UserController::class, 'updatePassword'])
         ->name('update-password');
-
-
     Route::get('/edit-profile', [RegistrationController::class, 'editProfile'])->name('edit');
-
     Route::post('/update-profile', [RegistrationController::class, 'updateProfile'])->name('update');
 });
 
@@ -473,4 +467,40 @@ Route::prefix('user')->name('user.')->middleware('auth:user')->group(function ()
 
 //===================================Cart routes start============================
 
-//===================================Cart routes end============================
+
+//======================================
+// === Manager User route Start===
+//======================================
+
+Route::middleware('guest:manager')->group(function () {
+    Route::get('/manager/login', [ManagerAuthController::class, 'loginForm'])->name('manager.login');
+    Route::post('/manager/login', [ManagerAuthController::class, 'login'])->name('manager.login.post');
+});
+
+Route::middleware('auth:manager')->prefix('manager')->name('manager.')->group(function () {
+    Route::get('/dashboard', [ManagerAuthController::class, 'dashboard'])->name('dashboard');
+    Route::post('/logout', [ManagerAuthController::class, 'logout'])->name('logout');
+});
+//======================================
+// === Manager User route End===
+//======================================
+
+
+//======================================
+// === designer User route Start===
+//======================================
+
+Route::middleware('guest:designer')->group(function () {
+    Route::get('/designer/login', [DesignerAuthController::class, 'loginForm'])->name('designer.login');
+    Route::post('/designer/login', [DesignerAuthController::class, 'login'])->name('designer.login.post');
+});
+
+Route::middleware('auth:designer')->prefix('designer')->name('designer.')->group(function () {
+    Route::get('/dashboard', [DesignerAuthController::class, 'dashboard'])->name('dashboard');
+    Route::post('/logout', [DesignerAuthController::class, 'logout'])->name('logout');
+});
+
+
+//======================================
+// === designer User route Start===
+//======================================

@@ -17,9 +17,9 @@ class ManagerDesignerUserController extends Controller
         $query = ManagerDesignerUser::query();
 
         if ($request->search) {
-            $query->where('first_name','like',"%{$request->search}%")
-                  ->orWhere('email','like',"%{$request->search}%")
-                  ->orWhere('mobile_number','like',"%{$request->search}%");
+            $query->where('first_name', 'like', "%{$request->search}%")
+                ->orWhere('email', 'like', "%{$request->search}%")
+                ->orWhere('mobile_number', 'like', "%{$request->search}%");
         }
 
         $data = $query->latest('manager_designer_user_id')->paginate(10);
@@ -30,46 +30,42 @@ class ManagerDesignerUserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'first_name'=>'required',
-            'email'=>'required|email|unique:manager_designer_user,email',
-            'mobile_number'=>'required',
+            'first_name' => 'required',
+            'email' => 'required|email|unique:manager_designer_user,email',
+            'mobile_number' => 'required',
         ]);
 
-    $plainPassword = $request->first_name . '@123';
+        $plainPassword = $request->first_name . '@123';
         ManagerDesignerUser::create([
-            'first_name'=>$request->first_name,
-            'email'=>$request->email,
-            'mobile_number'=>$request->mobile_number,
-            'password'=>Hash::make($plainPassword),
-            'role_type'=>$request->role_type,
-            'status'=>$request->status,
+            'first_name' => $request->first_name,
+            'email' => $request->email,
+            'mobile_number' => $request->mobile_number,
+            'password' => Hash::make($plainPassword),
+            'role_type' => $request->role_type,
+            'status' => $request->status,
+
         ]);
-        
-        //
-         $sendEmailDetails = DB::table('sendemaildetails')->where('id', 9)->first();
 
-    // 👉 Mail config
-    $msg = [
-        'FromMail' => $sendEmailDetails->strFromMail ?? '',
-        'Title'    => $sendEmailDetails->strTitle ?? '',
-        'ToEmail'  => $request->email,
-        'Subject'  => 'Your Account Created',
-    ];
+        $sendEmailDetails = DB::table('sendemaildetails')->where('id', 9)->first();
+        $msg = [
+            'FromMail' => $sendEmailDetails->strFromMail ?? '',
+            'Title'    => $sendEmailDetails->strTitle ?? '',
+            'ToEmail'  => $request->email,
+            'Subject'  => 'Your Account Created',
+        ];
 
-    $data = [
-        "name"     => $request->first_name,
-        "email"    => $request->email,
-        "password" => $plainPassword,
-        "role"     => ucfirst($request->role_type),
-    ];
+        $data = [
+            "name"     => $request->first_name,
+            "email"    => $request->email,
+            "password" => $plainPassword,
+            "role"     => ucfirst($request->role_type),
+        ];
 
-    // 👉 Send Mail
-    $dat =Mail::send('emails.user-create-mail', ['data' => $data], function ($message) use ($msg) {
-        $message->from($msg['FromMail'], $msg['Title']);
-        $message->to($msg['ToEmail'])->subject($msg['Subject']);
-    });
-    
-        return back()->with('success','User Created');
+        $dat = Mail::send('emails.user-create-mail', ['data' => $data], function ($message) use ($msg) {
+            $message->from($msg['FromMail'], $msg['Title']);
+            $message->to($msg['ToEmail'])->subject($msg['Subject']);
+        });
+        return back()->with('success', 'User Created');
     }
 
     public function edit($id)
@@ -82,21 +78,45 @@ class ManagerDesignerUserController extends Controller
         $user = ManagerDesignerUser::findOrFail($request->edit_id);
 
         $user->update([
-            'first_name'=>$request->first_name,
-           // 'last_name'=>$request->last_name,
-            'email'=>$request->email,
-            'mobile_number'=>$request->mobile_number,
-            'role_type'=>$request->role_type,
-            'status'=>$request->status,
+            'first_name' => $request->first_name,
+            // 'last_name'=>$request->last_name,
+            'email' => $request->email,
+            'mobile_number' => $request->mobile_number,
+            'role_type' => $request->role_type,
+            'status' => $request->status,
         ]);
 
-        return back()->with('success','Updated');
+        return back()->with('success', 'Updated');
     }
 
-   public function destroy($id)
+    public function destroy($id)
     {
-    ManagerDesignerUser::findOrFail($id)->delete();
+        ManagerDesignerUser::findOrFail($id)->delete();
 
-    return redirect()->back()->with('success', 'User deleted successfully.');
-}
+        return redirect()->back()->with('success', 'User deleted successfully.');
+    }
+    // 01-05-2026
+    public function passwordUpdate(Request $request)
+    {
+        if ($request->password !== $request->password_confirmation) {
+            return back()->with('error', 'New Passwords and Confirm Password do not match.');
+        }
+        $validated = $request->validate([
+            'user_id' => 'required|exists:manager_designer_user,manager_designer_user_id',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+        try {
+            $user = ManagerDesignerUser::findOrFail($validated['user_id']);
+            $user->update([
+                'password' => Hash::make($validated['password']),
+            ]);
+
+            return back()->with('success', 'Password changed successfully.');
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'error' => $th->getMessage(),
+            ], 500);
+        }
+    }
 }

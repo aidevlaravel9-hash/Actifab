@@ -21,25 +21,25 @@
                                     @csrf
 
                                     <div class="mb-3">
-                                        <label>First Name  <span style="color:red;">*</span></label>
-                                        <input type="text" name="first_name" class="form-control" placeholder="Enter first name"
-                                            value="{{ old('first_name') }}" required>
+                                        <label>First Name <span style="color:red;">*</span></label>
+                                        <input type="text" name="first_name" class="form-control"
+                                            placeholder="Enter first name" value="{{ old('first_name') }}" required>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label>Email  <span style="color:red;">*</span></label>
+                                        <label>Email <span style="color:red;">*</span></label>
                                         <input type="email" name="email" placeholder="Enter Email" class="form-control"
                                             value="{{ old('email') }}" required>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label>Mobile  <span style="color:red;">*</span></label>
-                                        <input type="text" name="mobile_number" placeholder="Enter Mobile number" class="form-control"
-                                            value="{{ old('mobile_number') }}" required>
+                                        <label>Mobile <span style="color:red;">*</span></label>
+                                        <input type="text" name="mobile_number" placeholder="Enter Mobile number"
+                                            class="form-control" value="{{ old('mobile_number') }}" required>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label>Role  <span style="color:red;">*</span></label>
+                                        <label>Role <span style="color:red;">*</span></label>
                                         <select name="role_type" class="form-control">
                                             <option value="manager">Manager</option>
                                             <option value="designer">Designer</option>
@@ -114,12 +114,17 @@
                                                             <i class="fas fa-edit"></i>
                                                         </button>
 
-                                                        <button class="btn btn-danger btn-sm"
-    data-bs-toggle="modal"
-    data-bs-target="#deleteRecordModal"
-    data-id="{{ $row->manager_designer_user_id }}">
-    <i class="fas fa-trash"></i>
-</button>
+                                                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                            data-bs-target="#deleteRecordModal"
+                                                            data-id="{{ $row->manager_designer_user_id }}">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+
+                                                        <button class="btn btn-warning btn-sm passwordBtn"
+                                                            data-id="{{ $row->manager_designer_user_id }}"
+                                                            data-name="{{ $row->first_name }}" title="Change Password">
+                                                            <i class="fas fa-key"></i>
+                                                        </button>
 
                                                     </td>
                                                 </tr>
@@ -198,51 +203,98 @@
             </form>
         </div>
     </div>
-    
+
     <!-- DELETE MODAL -->
-<div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+    <div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
 
-            <div class="modal-header">
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
 
-            <div class="modal-body text-center">
+                <div class="modal-body text-center">
 
-                <lord-icon 
-                    src="https://cdn.lordicon.com/gsqxdxog.json"
-                    trigger="loop"
-                    colors="primary:#f7b84b,secondary:#f06548"
-                    style="width:100px;height:100px">
-                </lord-icon>
+                    <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop"
+                        colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px">
+                    </lord-icon>
 
-                <h4 class="mt-3">Are you sure?</h4>
-                <p class="text-muted">Are you sure you want to delete this user?</p>
+                    <h4 class="mt-3">Are you sure?</h4>
+                    <p class="text-muted">Are you sure you want to delete this user?</p>
 
-                <div class="d-flex justify-content-center gap-2 mt-4">
+                    <div class="d-flex justify-content-center gap-2 mt-4">
 
-                    <a href="javascript:void(0);" class="btn btn-danger"
-                       onclick="event.preventDefault(); document.getElementById('user-delete-form').submit();">
-                        Yes, Delete It!
-                    </a>
+                        <a href="javascript:void(0);" class="btn btn-danger"
+                            onclick="event.preventDefault(); document.getElementById('user-delete-form').submit();">
+                            Yes, Delete It!
+                        </a>
 
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">
-                        Close
-                    </button>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+
+                    </div>
+
+                    <form id="user-delete-form" method="POST">
+                        @csrf
+                        @method('DELETE')
+                    </form>
 
                 </div>
 
-                <form id="user-delete-form" method="POST">
-                    @csrf
-                    @method('DELETE')
-                </form>
-
             </div>
-
         </div>
     </div>
-</div>
+
+    {{-- CHANGE PASSWORD MODAL --}}
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="POST" action="{{ route('manager-designer-user.password-update') }}">
+                @csrf
+                <input type="hidden" name="user_id" id="password_user_id">
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Change Password</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p class="mb-3">Update password for <strong id="password_user_name"></strong>.</p>
+
+                        <div class="mb-3">
+                            <label>New Password</label>
+                            <div class="input-group">
+                                <input type="password" placeholder="Enter New Password" name="password"
+                                    id="new_password_input" class="form-control" required minlength="6">
+                                <button type="button" class="btn btn-outline-secondary togglePasswordBtn"
+                                    data-target="#new_password_input">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Confirm Password</label>
+                            <div class="input-group">
+                                <input type="password" name="password_confirmation" placeholder="Enter Confirm Password"
+                                    id="confirm_password_input" class="form-control" required minlength="6">
+                                <button type="button" class="btn btn-outline-secondary togglePasswordBtn"
+                                    data-target="#confirm_password_input">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-primary">Change Password</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
 @endsection
 @section('scripts')
@@ -267,28 +319,52 @@
             });
 
         });
-
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-        
+        document.addEventListener('DOMContentLoaded', function() {
+
             var deleteModal = document.getElementById('deleteRecordModal');
-        
-            deleteModal.addEventListener('show.bs.modal', function (event) {
-        
+
+            deleteModal.addEventListener('show.bs.modal', function(event) {
+
                 var button = event.relatedTarget;
                 var id = button.getAttribute('data-id');
-        
+
                 var form = document.getElementById('user-delete-form');
-        
+
                 var url = "{{ route('manager-designer-user.destroy', ':id') }}";
                 url = url.replace(':id', id);
-        
+
                 form.action = url;
-        
+
             });
-        
+
         });
-</script>
+    </script>
+    <script>
+        $(document).on('click', '.passwordBtn', function() {
+            const userId = $(this).data('id');
+            const userName = $(this).data('name');
+
+            $('#password_user_id').val(userId);
+            $('#password_user_name').text(userName);
+
+            new bootstrap.Modal(document.getElementById('changePasswordModal')).show();
+        });
+
+        $(document).on('click', '.togglePasswordBtn', function() {
+            const targetSelector = $(this).data('target');
+            const input = $(targetSelector);
+            const icon = $(this).find('i');
+
+            if (input.attr('type') === 'password') {
+                input.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                input.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+    </script>
 
 @endsection

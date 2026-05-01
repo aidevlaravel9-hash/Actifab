@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class ManagerDesignerUser extends Model
+class ManagerDesignerUser extends Authenticatable
 {
     protected $table = 'manager_designer_user';
     protected $primaryKey = 'manager_designer_user_id';
-
     public $timestamps = true;
 
     protected $fillable = [
