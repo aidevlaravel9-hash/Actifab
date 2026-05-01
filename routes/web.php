@@ -4,17 +4,19 @@ use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\LoginController;
-
+use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\PanelController;
+use App\Http\Controllers\PanelDesignController;
+use App\Http\Controllers\SectionController;
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
-
+use Illuminate\Support\Facades\Hash;
 
 
 use App\Http\Controllers\Admin\NoOfPolesController;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -29,6 +31,45 @@ use App\Http\Controllers\Admin\NoOfPolesController;
 // Route::fallback(function () {
 //     return view('errors.404'); // Make sure the view path matches your custom 404 page
 // });
+Route::get('/registration', [RegistrationController::class, 'create'])->name('registration.create');
+Route::post('/registration/store', [RegistrationController::class, 'store'])->name('registration.store');
+Route::get('/verify-otp', [RegistrationController::class, 'showVerifyOtp'])
+    ->name('verify.otp');
+
+Route::post('/verify-otp', [RegistrationController::class, 'verifyOtp'])
+    ->name('verify.otp.submit');
+
+Route::get('/user/login', [RegistrationController::class, 'loginForm'])->name('loginuser');
+Route::post('/login', [RegistrationController::class, 'login'])->name('login.post');
+
+Route::post('/user/logout', [RegistrationController::class, 'logout'])
+    ->name('user.logout');
+
+Route::post('/resend-otp', [RegistrationController::class, 'resendOtp'])
+    ->name('otp.resend');
+
+// show change password page
+Route::get('/change-password', [RegistrationController::class, 'showChangePassword'])
+    ->name('password.change');
+
+// handle password update
+Route::post('/change-password/update', [RegistrationController::class, 'changePassword'])
+    ->name('password.update');
+
+// update password
+// Route::post('/update-password', [RegistrationController::class, 'updatePassword'])
+//     ->name('password.update');
+
+Route::get('/forgot-password', [RegistrationController::class, 'forgotForm'])
+    ->name('password.forgot');
+
+Route::post('/forgot-password', [RegistrationController::class, 'sendNewPassword'])
+    ->name('password.send');
+
+// Route::get('/dashboard', [RegistrationController::class, 'dashboard'])
+//     ->name('dashboard');
+
+
 
 Route::get('login', fn() => redirect()->route('admin.login'))->name('login');
 
@@ -65,7 +106,6 @@ Route::resource('roles', App\Http\Controllers\RolesController::class);
 Route::resource('permissions', App\Http\Controllers\PermissionsController::class);
 
 
-
 // Users
 Route::middleware('auth')->prefix('users')->name('users.')->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('index');
@@ -83,42 +123,55 @@ Route::middleware('auth')->prefix('users')->name('users.')->group(function () {
 
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::get('section', [App\Http\Controllers\Admin\SectionController::class, 'index'])->name('section.index');
+    Route::post('section/store', [App\Http\Controllers\Admin\SectionController::class, 'store'])->name('sectionstore');
+    Route::post('section/update', [App\Http\Controllers\Admin\SectionController::class, 'update'])->name('sectionupdate');
+    Route::delete('section/delete/{id}', [App\Http\Controllers\Admin\SectionController::class, 'destroy'])->name('section.destroy');
+    Route::post('section/bulk-delete', [App\Http\Controllers\Admin\SectionController::class, 'bulkDelete'])->name('section.bulkDelete');
+    Route::post('section/status', [App\Http\Controllers\Admin\SectionController::class, 'status'])->name('section.status');
+    Route::get('section/edit/{id}', [App\Http\Controllers\Admin\SectionController::class, 'edit'])->name('section.edit');
+});
+
+Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('feeder-category', [App\Http\Controllers\Admin\FeederCategoryController::class, 'index'])->name('feeder-category.index');
     Route::post('feeder-category/store', [App\Http\Controllers\Admin\FeederCategoryController::class, 'store'])->name('feeder-category.store');
     Route::post('feeder-category/update', [App\Http\Controllers\Admin\FeederCategoryController::class, 'update'])->name('feeder-category.update');
-    Route::post('feeder-category/delete', [App\Http\Controllers\Admin\FeederCategoryController::class, 'destroy'])->name('feeder-category.destroy');
+    Route::delete('feeder-category/delete/{id}', [App\Http\Controllers\Admin\FeederCategoryController::class, 'destroy'])->name('feeder-category.destroy');
     Route::post('feeder-category/bulk-delete', [App\Http\Controllers\Admin\FeederCategoryController::class, 'bulkDelete'])->name('feeder-category.bulkDelete');
     Route::post('feeder-category/status', [App\Http\Controllers\Admin\FeederCategoryController::class, 'status'])->name('feeder-category.status');
     Route::get('feeder-category/edit/{id}', [App\Http\Controllers\Admin\FeederCategoryController::class, 'edit'])->name('feeder-category.edit');
 });
-
+Route::get('/get-feeder-categories/{sectionTypeId}', [App\Http\Controllers\Admin\FeederTypeController::class, 'getFeederCategories']);
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('feeder-type', [App\Http\Controllers\Admin\FeederTypeController::class, 'index'])->name('feeder-type.index');
     Route::post('feeder-type/store', [App\Http\Controllers\Admin\FeederTypeController::class, 'store'])->name('feeder-type.store');
     Route::post('feeder-type/update', [App\Http\Controllers\Admin\FeederTypeController::class, 'update'])->name('feeder-type.update');
-    Route::post('feeder-type/delete', [App\Http\Controllers\Admin\FeederTypeController::class, 'destroy'])->name('feeder-type.destroy');
+    Route::delete('feeder-type/delete/{id}', [App\Http\Controllers\Admin\FeederTypeController::class, 'destroy'])->name('feeder-type.destroy');
     Route::post('feeder-type/bulk-delete', [App\Http\Controllers\Admin\FeederTypeController::class, 'bulkDelete'])->name('feeder-type.bulkDelete');
     Route::post('feeder-type/status', [App\Http\Controllers\Admin\FeederTypeController::class, 'status'])->name('feeder-type.status');
     Route::get('feeder-type/edit/{id}', [App\Http\Controllers\Admin\FeederTypeController::class, 'edit'])->name('feeder-type.edit');
+    Route::get('/get-feeder-category/{section_id}', [App\Http\Controllers\Admin\FeederTypeController::class, 'getCategory']);
 });
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('feeder-sub-type', [App\Http\Controllers\Admin\FeederSubTypeController::class, 'index'])->name('feeder-sub-type.index');
     Route::post('feeder-sub-type/store', [App\Http\Controllers\Admin\FeederSubTypeController::class, 'store'])->name('feeder-sub-type.store');
     Route::post('feeder-sub-type/update', [App\Http\Controllers\Admin\FeederSubTypeController::class, 'update'])->name('feeder-sub-type.update');
-    Route::post('feeder-sub-type/delete', [App\Http\Controllers\Admin\FeederSubTypeController::class, 'destroy'])->name('feeder-sub-type.destroy');
+    Route::delete('feeder-sub-type/delete/{id}', [App\Http\Controllers\Admin\FeederSubTypeController::class, 'destroy'])->name('feeder-sub-type.destroy');
     Route::post('feeder-sub-type/bulk-delete', [App\Http\Controllers\Admin\FeederSubTypeController::class, 'bulkDelete'])->name('feeder-sub-type.bulkDelete');
     Route::post('feeder-sub-type/status', [App\Http\Controllers\Admin\FeederSubTypeController::class, 'status'])->name('feeder-sub-type.status');
     Route::get('feeder-sub-type/edit/{id}', [App\Http\Controllers\Admin\FeederSubTypeController::class, 'edit'])->name('feeder-sub-type.edit');
-});
 
+    Route::get('get-feeder-category/{section_id}', [App\Http\Controllers\Admin\FeederSubTypeController::class, 'getCategory']);
+    Route::get('get-feeder-type/{category_id}', [App\Http\Controllers\Admin\FeederSubTypeController::class, 'getType']);
+});
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('panel-type', [App\Http\Controllers\Admin\PanelTypeController::class, 'index'])->name('panel-type.index');
     Route::post('panel-type/store', [App\Http\Controllers\Admin\PanelTypeController::class, 'store'])->name('panel-type.store');
     Route::post('panel-type/update', [App\Http\Controllers\Admin\PanelTypeController::class, 'update'])->name('panel-type.update');
-    Route::post('panel-type/delete', [App\Http\Controllers\Admin\PanelTypeController::class, 'destroy'])->name('panel-type.destroy');
+    Route::delete('panel-type/delete/{id}', [App\Http\Controllers\Admin\PanelTypeController::class, 'destroy'])->name('panel-type.destroy');
     Route::post('panel-type/bulk-delete', [App\Http\Controllers\Admin\PanelTypeController::class, 'bulkDelete'])->name('panel-type.bulkDelete');
     Route::post('panel-type/status', [App\Http\Controllers\Admin\PanelTypeController::class, 'status'])->name('panel-type.status');
     Route::get('panel-type/edit/{id}', [App\Http\Controllers\Admin\PanelTypeController::class, 'edit'])->name('panel-type.edit');
@@ -129,7 +182,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('parts-category', [App\Http\Controllers\Admin\PartsCategoryController::class, 'index'])->name('parts-category.index');
     Route::post('parts-category/store', [App\Http\Controllers\Admin\PartsCategoryController::class, 'store'])->name('parts-category.store');
     Route::post('parts-category/update', [App\Http\Controllers\Admin\PartsCategoryController::class, 'update'])->name('parts-category.update');
-    Route::post('parts-category/delete', [App\Http\Controllers\Admin\PartsCategoryController::class, 'destroy'])->name('parts-category.destroy');
+    Route::delete('parts-category/delete/{id}', [App\Http\Controllers\Admin\PartsCategoryController::class, 'destroy'])->name('parts-category.destroy');
     Route::post('parts-category/bulk-delete', [App\Http\Controllers\Admin\PartsCategoryController::class, 'bulkDelete'])->name('parts-category.bulkDelete');
     Route::post('parts-category/status', [App\Http\Controllers\Admin\PartsCategoryController::class, 'status'])->name('parts-category.status');
     Route::get('parts-category/edit/{id}', [App\Http\Controllers\Admin\PartsCategoryController::class, 'edit'])->name('parts-category.edit');
@@ -139,7 +192,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('parts-master', [App\Http\Controllers\Admin\PartsMasterController::class, 'index'])->name('parts-master.index');
     Route::post('parts-master/store', [App\Http\Controllers\Admin\PartsMasterController::class, 'store'])->name('parts-master.store');
     Route::post('parts-master/update', [App\Http\Controllers\Admin\PartsMasterController::class, 'update'])->name('parts-master.update');
-    Route::post('parts-master/delete', [App\Http\Controllers\Admin\PartsMasterController::class, 'destroy'])->name('parts-master.destroy');
+    Route::delete('parts-master/delete/{id}', [App\Http\Controllers\Admin\PartsMasterController::class, 'destroy'])->name('parts-master.destroy');
     Route::post('parts-master/bulk-delete', [App\Http\Controllers\Admin\PartsMasterController::class, 'bulkDelete'])->name('parts-master.bulkDelete');
     Route::post('parts-master/status', [App\Http\Controllers\Admin\PartsMasterController::class, 'status'])->name('parts-master.status');
     Route::get('parts-master/edit/{id}', [App\Http\Controllers\Admin\PartsMasterController::class, 'edit'])->name('parts-master.edit');
@@ -162,7 +215,9 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('system-rating', [App\Http\Controllers\Admin\SystemRatingController::class, 'index'])->name('system-rating.index');
     Route::post('system-rating/store', [App\Http\Controllers\Admin\SystemRatingController::class, 'store'])->name('system-rating.store');
     Route::post('system-rating/update', [App\Http\Controllers\Admin\SystemRatingController::class, 'update'])->name('system-rating.update');
-    Route::post('system-rating/delete', [App\Http\Controllers\Admin\SystemRatingController::class, 'destroy'])->name('system-rating.delete');
+    Route::delete('/system-current-rating/delete/{id}', [App\Http\Controllers\Admin\SystemRatingController::class, 'destroy'])
+        ->name('system-current-rating.delete');
+    // Route::post('system-rating/delete', [App\Http\Controllers\Admin\SystemRatingController::class, 'destroy'])->name('system-rating.delete');
     Route::post('system-rating/bulk-delete', [App\Http\Controllers\Admin\SystemRatingController::class, 'bulkDelete'])->name('system-rating.bulkDelete');
     Route::post('system-rating/status', [App\Http\Controllers\Admin\SystemRatingController::class, 'status'])->name('system-rating.status');
 });
@@ -173,7 +228,12 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('poles', [App\Http\Controllers\Admin\NoOfPolesController::class, 'index'])->name('poles.index');
     Route::post('poles/store', [App\Http\Controllers\Admin\NoOfPolesController::class, 'store'])->name('poles.store');
     Route::post('poles/update', [App\Http\Controllers\Admin\NoOfPolesController::class, 'update'])->name('poles.update');
-    Route::post('poles/delete', [App\Http\Controllers\Admin\NoOfPolesController::class, 'destroy'])->name('poles.delete');
+    // Route::post('poles/delete', [App\Http\Controllers\Admin\NoOfPolesController::class, 'destroy'])->name('poles.delete');
+    Route::delete(
+        'poles/delete/{id}',
+        [App\Http\Controllers\Admin\NoOfPolesController::class, 'destroy']
+    )
+        ->name('poles.delete');
     Route::post('poles/bulk-delete', [App\Http\Controllers\Admin\NoOfPolesController::class, 'bulkDelete'])->name('poles.bulkDelete');
     Route::post('poles/status', [App\Http\Controllers\Admin\NoOfPolesController::class, 'status'])->name('poles.status');
 });
@@ -183,17 +243,16 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('voltage', [App\Http\Controllers\Admin\OperatingVoltageController::class, 'index'])->name('voltage.index');
     Route::post('voltage/store', [App\Http\Controllers\Admin\OperatingVoltageController::class, 'store'])->name('voltage.store');
     Route::post('voltage/update', [App\Http\Controllers\Admin\OperatingVoltageController::class, 'update'])->name('voltage.update');
-    Route::post('voltage/delete', [App\Http\Controllers\Admin\OperatingVoltageController::class, 'destroy'])->name('voltage.delete');
+    Route::delete('voltage/delete/{id}', [App\Http\Controllers\Admin\OperatingVoltageController::class, 'destroy'])->name('voltage.delete');
     Route::post('voltage/bulk-delete', [App\Http\Controllers\Admin\OperatingVoltageController::class, 'bulkDelete'])->name('voltage.bulkDelete');
     Route::post('voltage/status', [App\Http\Controllers\Admin\OperatingVoltageController::class, 'status'])->name('voltage.status');
 });
-
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('form-type', [App\Http\Controllers\Admin\FormTypeController::class, 'index'])->name('form-type.index');
     Route::post('form-type/store', [App\Http\Controllers\Admin\FormTypeController::class, 'store'])->name('form-type.store');
     Route::post('form-type/update', [App\Http\Controllers\Admin\FormTypeController::class, 'update'])->name('form-type.update');
-    Route::post('form-type/delete', [App\Http\Controllers\Admin\FormTypeController::class, 'destroy'])->name('form-type.delete');
+    Route::delete('form-type/delete/{id}', [App\Http\Controllers\Admin\FormTypeController::class, 'destroy'])->name('form-type.delete');
     Route::post('form-type/bulk-delete', [App\Http\Controllers\Admin\FormTypeController::class, 'bulkDelete'])->name('form-type.bulkDelete');
     Route::post('form-type/status', [App\Http\Controllers\Admin\FormTypeController::class, 'status'])->name('form-type.status');
 });
@@ -202,7 +261,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('panel-access', [App\Http\Controllers\Admin\PanelAccessController::class, 'index'])->name('panel-access.index');
     Route::post('panel-access/store', [App\Http\Controllers\Admin\PanelAccessController::class, 'store'])->name('panel-access.store');
     Route::post('panel-access/update', [App\Http\Controllers\Admin\PanelAccessController::class, 'update'])->name('panel-access.update');
-    Route::post('panel-access/delete', [App\Http\Controllers\Admin\PanelAccessController::class, 'destroy'])->name('panel-access.delete');
+    Route::delete('panel-access/delete/{id}', [App\Http\Controllers\Admin\PanelAccessController::class, 'destroy'])->name('panel-access.delete');
     Route::post('panel-access/bulk-delete', [App\Http\Controllers\Admin\PanelAccessController::class, 'bulkDelete'])->name('panel-access.bulkDelete');
     Route::post('panel-access/status', [App\Http\Controllers\Admin\PanelAccessController::class, 'status'])->name('panel-access.status');
 });
@@ -211,7 +270,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('panel-board-colour', [App\Http\Controllers\Admin\PanelBoardColourController::class, 'index'])->name('panel-board-colour.index');
     Route::post('panel-board-colour/store', [App\Http\Controllers\Admin\PanelBoardColourController::class, 'store'])->name('panel-board-colour.store');
     Route::post('panel-board-colour/update', [App\Http\Controllers\Admin\PanelBoardColourController::class, 'update'])->name('panel-board-colour.update');
-    Route::post('panel-board-colour/delete', [App\Http\Controllers\Admin\PanelBoardColourController::class, 'destroy'])->name('panel-board-colour.delete');
+    Route::delete('panel-board-colour/delete/{id}', [App\Http\Controllers\Admin\PanelBoardColourController::class, 'destroy'])->name('panel-board-colour.delete');
     Route::post('panel-board-colour/bulk-delete', [App\Http\Controllers\Admin\PanelBoardColourController::class, 'bulkDelete'])->name('panel-board-colour.bulkDelete');
     Route::post('panel-board-colour/status', [App\Http\Controllers\Admin\PanelBoardColourController::class, 'status'])->name('panel-board-colour.status');
 });
@@ -220,7 +279,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('ip-protection', [App\Http\Controllers\Admin\IpProtectionController::class, 'index'])->name('ip-protection.index');
     Route::post('ip-protection/store', [App\Http\Controllers\Admin\IpProtectionController::class, 'store'])->name('ip-protection.store');
     Route::post('ip-protection/update', [App\Http\Controllers\Admin\IpProtectionController::class, 'update'])->name('ip-protection.update');
-    Route::post('ip-protection/delete', [App\Http\Controllers\Admin\IpProtectionController::class, 'destroy'])->name('ip-protection.delete');
+    Route::delete('ip-protection/delete/{id}', [App\Http\Controllers\Admin\IpProtectionController::class, 'destroy'])->name('ip-protection.delete');
     Route::post('ip-protection/bulk-delete', [App\Http\Controllers\Admin\IpProtectionController::class, 'bulkDelete'])->name('ip-protection.bulkDelete');
     Route::post('ip-protection/status', [App\Http\Controllers\Admin\IpProtectionController::class, 'status'])->name('ip-protection.status');
 });
@@ -229,7 +288,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('lock-system', [App\Http\Controllers\Admin\LockSystemController::class, 'index'])->name('lock-system.index');
     Route::post('lock-system/store', [App\Http\Controllers\Admin\LockSystemController::class, 'store'])->name('lock-system.store');
     Route::post('lock-system/update', [App\Http\Controllers\Admin\LockSystemController::class, 'update'])->name('lock-system.update');
-    Route::post('lock-system/delete', [App\Http\Controllers\Admin\LockSystemController::class, 'destroy'])->name('lock-system.delete');
+    Route::delete('lock-system/delete/{id}', [App\Http\Controllers\Admin\LockSystemController::class, 'destroy'])->name('lock-system.delete');
     Route::post('lock-system/bulk-delete', [App\Http\Controllers\Admin\LockSystemController::class, 'bulkDelete'])->name('lock-system.bulkDelete');
     Route::post('lock-system/status', [App\Http\Controllers\Admin\LockSystemController::class, 'status'])->name('lock-system.status');
 });
@@ -238,7 +297,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('busbar-position', [App\Http\Controllers\Admin\BusbarPositionController::class, 'index'])->name('busbar-position.index');
     Route::post('busbar-position/store', [App\Http\Controllers\Admin\BusbarPositionController::class, 'store'])->name('busbar-position.store');
     Route::post('busbar-position/update', [App\Http\Controllers\Admin\BusbarPositionController::class, 'update'])->name('busbar-position.update');
-    Route::post('busbar-position/delete', [App\Http\Controllers\Admin\BusbarPositionController::class, 'destroy'])->name('busbar-position.delete');
+    Route::delete('busbar-position/delete/{id}', [App\Http\Controllers\Admin\BusbarPositionController::class, 'destroy'])->name('busbar-position.delete');
     Route::post('busbar-position/bulk-delete', [App\Http\Controllers\Admin\BusbarPositionController::class, 'bulkDelete'])->name('busbar-position.bulkDelete');
     Route::post('busbar-position/status', [App\Http\Controllers\Admin\BusbarPositionController::class, 'status'])->name('busbar-position.status');
 });
@@ -247,7 +306,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('gland-plate-thickness', [App\Http\Controllers\Admin\GlandPlateThicknessController::class, 'index'])->name('gland-plate-thickness.index');
     Route::post('gland-plate-thickness/store', [App\Http\Controllers\Admin\GlandPlateThicknessController::class, 'store'])->name('gland-plate-thickness.store');
     Route::post('gland-plate-thickness/update', [App\Http\Controllers\Admin\GlandPlateThicknessController::class, 'update'])->name('gland-plate-thickness.update');
-    Route::post('gland-plate-thickness/delete', [App\Http\Controllers\Admin\GlandPlateThicknessController::class, 'destroy'])->name('gland-plate-thickness.delete');
+    Route::delete('gland-plate-thickness/delete/{id}', [App\Http\Controllers\Admin\GlandPlateThicknessController::class, 'destroy'])->name('gland-plate-thickness.delete');
     Route::post('gland-plate-thickness/bulk-delete', [App\Http\Controllers\Admin\GlandPlateThicknessController::class, 'bulkDelete'])->name('gland-plate-thickness.bulkDelete');
     Route::post('gland-plate-thickness/status', [App\Http\Controllers\Admin\GlandPlateThicknessController::class, 'status'])->name('gland-plate-thickness.status');
 });
@@ -256,7 +315,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('outgoing-cable-position', [App\Http\Controllers\Admin\OutgoingCablePositionController::class, 'index'])->name('outgoing-cable-position.index');
     Route::post('outgoing-cable-position/store', [App\Http\Controllers\Admin\OutgoingCablePositionController::class, 'store'])->name('outgoing-cable-position.store');
     Route::post('outgoing-cable-position/update', [App\Http\Controllers\Admin\OutgoingCablePositionController::class, 'update'])->name('outgoing-cable-position.update');
-    Route::post('outgoing-cable-position/delete', [App\Http\Controllers\Admin\OutgoingCablePositionController::class, 'destroy'])->name('outgoing-cable-position.delete');
+    Route::delete('outgoing-cable-position/delete/{id}', [App\Http\Controllers\Admin\OutgoingCablePositionController::class, 'destroy'])->name('outgoing-cable-position.delete');
     Route::post('outgoing-cable-position/bulk-delete', [App\Http\Controllers\Admin\OutgoingCablePositionController::class, 'bulkDelete'])->name('outgoing-cable-position.bulkDelete');
     Route::post('outgoing-cable-position/status', [App\Http\Controllers\Admin\OutgoingCablePositionController::class, 'status'])->name('outgoing-cable-position.status');
 });
@@ -265,7 +324,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('plinth-type', [App\Http\Controllers\Admin\PlinthTypeController::class, 'index'])->name('plinth-type.index');
     Route::post('plinth-type/store', [App\Http\Controllers\Admin\PlinthTypeController::class, 'store'])->name('plinth-type.store');
     Route::post('plinth-type/update', [App\Http\Controllers\Admin\PlinthTypeController::class, 'update'])->name('plinth-type.update');
-    Route::post('plinth-type/delete', [App\Http\Controllers\Admin\PlinthTypeController::class, 'destroy'])->name('plinth-type.delete');
+    Route::delete('plinth-type/delete/{id}', [App\Http\Controllers\Admin\PlinthTypeController::class, 'destroy'])->name('plinth-type.delete');
     Route::post('plinth-type/bulk-delete', [App\Http\Controllers\Admin\PlinthTypeController::class, 'bulkDelete'])->name('plinth-type.bulkDelete');
     Route::post('plinth-type/status', [App\Http\Controllers\Admin\PlinthTypeController::class, 'status'])->name('plinth-type.status');
 });
@@ -274,7 +333,144 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('certification', [App\Http\Controllers\Admin\CertificationController::class, 'index'])->name('certification.index');
     Route::post('certification/store', [App\Http\Controllers\Admin\CertificationController::class, 'store'])->name('certification.store');
     Route::post('certification/update', [App\Http\Controllers\Admin\CertificationController::class, 'update'])->name('certification.update');
-    Route::post('certification/delete', [App\Http\Controllers\Admin\CertificationController::class, 'destroy'])->name('certification.delete');
+    Route::delete('certification/delete/{id}', [App\Http\Controllers\Admin\CertificationController::class, 'destroy'])->name('certification.delete');
     Route::post('certification/bulk-delete', [App\Http\Controllers\Admin\CertificationController::class, 'bulkDelete'])->name('certification.bulkDelete');
     Route::post('certification/status', [App\Http\Controllers\Admin\CertificationController::class, 'status'])->name('certification.status');
 });
+
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::get('/projects/in-development', [App\Http\Controllers\Admin\SubmitController::class, 'inDevelopment'])
+        ->name('projects.inDevelopment');
+    Route::get('/projects/completed', [App\Http\Controllers\Admin\SubmitController::class, 'completedProjects'])
+        ->name('projects.completed');
+    Route::get('/admin/panel/section-list/{id}', [App\Http\Controllers\Admin\SubmitController::class, 'adminsectionFeederList'])->name('admin.panel.section.list');
+    Route::post('/complete-project-panel/{id}', [App\Http\Controllers\Admin\SubmitController::class, 'completeProject'])->name('complete.project.panel');
+});
+//30042026
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::get('manager-designer-user', [App\Http\Controllers\Admin\ManagerDesignerUserController::class, 'index'])->name('manager-designer-user.index');
+    Route::post('manager-designer-user/store', [App\Http\Controllers\Admin\ManagerDesignerUserController::class, 'store'])->name('manager-designer-user.store');
+    Route::post('manager-designer-user/update', [App\Http\Controllers\Admin\ManagerDesignerUserController::class, 'update'])->name('manager-designer-user.update');
+    Route::delete('manager-designer-user/{id}', [App\Http\Controllers\Admin\ManagerDesignerUserController::class, 'destroy'])
+        ->name('manager-designer-user.destroy');
+    Route::get('manager-designer-user/edit/{id?}', [App\Http\Controllers\Admin\ManagerDesignerUserController::class, 'edit'])->name('manager-designer-user.edit');
+});
+//30042026
+
+
+// Route::get('/dashboard', [PanelController::class, 'dashboard'])
+//     ->name('dashboard');
+
+
+
+// Route::post('/store-projects', [PanelController::class, 'storeproject'])->name('storeProject');
+
+// Route::get('/create-project', [PanelController::class, 'create_project'])
+//     ->name('CreateProject');
+
+
+Route::get('/create-panel', [PanelController::class, 'create_section'])
+    ->name('CreateSection');
+
+Route::get('user-panel/get-panel-job-no/{project_id}', [PanelController::class, 'getPanelJobNo']);
+
+Route::middleware('auth:user')->group(function () {
+
+    Route::get('/projects', [PanelController::class, 'index'])->name('indexProject');
+    Route::post('/project/update/{id}', [PanelController::class, 'updateproject'])->name('updateProject');
+    Route::get('/project-status/{id}', [PanelController::class, 'toggleStatus'])
+        ->name('project.toggleStatus');
+    Route::delete('/delete-project/{id}', [PanelController::class, 'deleteproject'])->name('deleteproject');
+
+    // Route::get('/add-panel-board', [PanelController::class, 'add_panel_board'])
+    //     ->name('AddPanelBoard');
+    Route::get('/project/add-panel-board/{project_id}', [PanelController::class, 'add_panel_board'])->name('AddPanelBoard');
+
+    Route::get('/project/panels/{id}', [PanelController::class, 'panelListing'])
+        ->name('PanelListing');
+
+    Route::post('/store-panel-board', [PanelController::class, 'store_panel_board'])->name('StorePanelBoard');
+    Route::delete('/delete-panel-board/{id}', [PanelController::class, 'delete_panel_board'])->name('DeletePanelBoard');
+
+    Route::get('/panel/{panel_id}/add-section', [PanelController::class, 'add_section'])->name('AddSection');
+
+    Route::get('/dashboard', [PanelController::class, 'dashboard'])->name('dashboard');
+    Route::post('/submit-project-panel/{id}', [PanelController::class, 'submitProject'])
+        ->name('submit.project.panel');
+
+    Route::get('/create-project', [PanelController::class, 'create_project'])->name('CreateProject');
+    Route::get('/project/{project_id}/edit-panel-board/{id}', [PanelController::class, 'edit_panel_board'])->name('EditPanelBoard');
+    Route::post('/update-panel-board/{id}', [PanelController::class, 'update_panel_board'])->name('UpdatePanelBoard');
+    Route::post('/store-project', [PanelController::class, 'storeproject'])->name('storeProject');
+
+    // Edit (open same page)
+    Route::get('/project/edit/{id}', [PanelController::class, 'editproject'])->name('editProject');
+
+    //Nisha-160226 Start
+    // Route::get('/panel/{id?}', [PanelDesignController::class, 'show'])->name('panel.show');
+    Route::get('/panel/{panelId}/section/{sectionId?}', [PanelDesignController::class, 'show'])->name('panel.show');
+
+    Route::get('/panel/section-list/{id}', [PanelDesignController::class, 'sectionFeederList'])->name('panel.section.list');
+
+    Route::post('/section/store', [PanelDesignController::class, 'storeSection'])
+        ->name('section.store');
+
+    Route::get('/section/{id}/edit', [PanelDesignController::class, 'editSection'])
+        ->name('section.edit');
+
+    Route::post('/section/{id}/update', [PanelDesignController::class, 'updateSection'])
+        ->name('section.update');
+
+    Route::delete('/section/{id}', [PanelDesignController::class, 'deleteSection'])
+        ->name('section.delete');
+
+    Route::post('/feeder/store', [PanelDesignController::class, 'storeFeeder'])
+        ->name('feeder.store');
+    Route::get('/get-feeder-count/{section_id}', function ($section_id) {
+        $count = \App\Models\Feeder::where('section_id', $section_id)->count();
+        return response()->json(['count' => $count]);
+    });
+
+    Route::post('/feeder/update/{id}', [PanelDesignController::class, 'updateFeeder'])
+        ->name('feeder.update');
+
+    Route::delete('/feeder/delete/{id}', [PanelDesignController::class, 'deleteFeeder'])
+        ->name('feeder.delete');
+
+    Route::get('get-feeder-types/{categoryId}', [PanelDesignController::class, 'getTypes']);
+    Route::get('get-feeder-subtypes/{typeId}', [PanelDesignController::class, 'getSubTypes']);
+    //Nisha-160226 End
+});
+
+// Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('forgot.password');
+
+Route::prefix('user')->name('user.')->middleware('auth:user')->group(function () {
+
+    Route::get('/profile', [RegistrationController::class, 'getUserProfile'])
+        ->name('detail');
+
+    Route::post('/change-password', [RegistrationController::class, 'changePassword'])
+        ->name('change-password');
+
+    Route::post('/update-password', [UserController::class, 'updatePassword'])
+        ->name('update-password');
+
+
+    Route::get('/edit-profile', [RegistrationController::class, 'editProfile'])->name('edit');
+
+    Route::post('/update-profile', [RegistrationController::class, 'updateProfile'])->name('update');
+});
+
+// Route::any('/', [FrontController::class, 'index'])->name('front.index');
+// Route::any('/about', [FrontController::class, 'about'])->name('front.about');
+
+// Route::get('/blog', [FrontController::class, 'blog'])->name('front.blog');
+
+
+// Route::get('/contact-us', [FrontController::class, 'contactus'])->name('front.contact_us');
+// Route::post('/contact-us', [FrontController::class, 'contact_us_store'])->name('front.contact_us_store');
+// Route::get('refresh_captcha', [FrontController::class, 'refreshCaptcha'])->name('refresh_captcha');
+
+//===================================Cart routes start============================
+
+//===================================Cart routes end============================

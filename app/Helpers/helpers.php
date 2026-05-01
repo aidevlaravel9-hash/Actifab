@@ -12,6 +12,25 @@ use Illuminate\Support\Facades\Mail;
 
 function FolderPath($folderName)
 {
+
+    // if (!function_exists('imagePath')) {
+
+    //     function imagePath($folder, $file = null, $type = 'url')
+    //     {
+    //         if (!$file) {
+    //             return asset('images/no-image.png');
+    //         }
+
+    //         if ($type === 'file') {
+    //             // filesystem path
+    //             return public_path($folder . '/' . $file);
+    //         }
+
+    //         // URL path
+    //         return asset($folder . '/' . $file);
+    //     }
+    // }
+
     if ($_SERVER['SERVER_NAME'] == "127.0.0.1") {
         return $_SERVER['DOCUMENT_ROOT'] . '/' . $folderName;
     } else {

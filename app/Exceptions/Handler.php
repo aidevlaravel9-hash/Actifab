@@ -43,6 +43,16 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
+        
+        if ($request->ajax() || $request->expectsJson()) {
+    return response()->json([
+        'success' => false,
+        'job_no' => '',
+        'message' => $e->getMessage(), // 👈 SHOW REAL ERROR
+    ], 500);
+}
+    
+    
         if ($e instanceof NotFoundHttpException) {
 
 

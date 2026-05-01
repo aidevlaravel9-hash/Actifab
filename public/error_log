@@ -1,0 +1,33 @@
+[03-Feb-2026 11:52:46 UTC] PHP Warning:  require(/home1/getdemo/public_html/Actifab/../Actifab/vendor/autoload.php): Failed to open stream: No such file or directory in /home1/getdemo/public_html/Actifab/index.php on line 34
+[03-Feb-2026 11:52:46 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home1/getdemo/public_html/Actifab/../Actifab/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home1/getdemo/public_html/Actifab/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home1/getdemo/public_html/Actifab/index.php on line 34
+[03-Feb-2026 11:53:14 UTC] PHP Warning:  require(/home1/getdemo/public_html/Actifab/Actifab/vendor/autoload.php): Failed to open stream: No such file or directory in /home1/getdemo/public_html/Actifab/index.php on line 34
+[03-Feb-2026 11:53:14 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home1/getdemo/public_html/Actifab/Actifab/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home1/getdemo/public_html/Actifab/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home1/getdemo/public_html/Actifab/index.php on line 34
+[03-Feb-2026 11:53:19 UTC] PHP Warning:  require(/home1/getdemo/public_html/Actifab/Actifab/vendor/autoload.php): Failed to open stream: No such file or directory in /home1/getdemo/public_html/Actifab/index.php on line 34
+[03-Feb-2026 11:53:19 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home1/getdemo/public_html/Actifab/Actifab/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home1/getdemo/public_html/Actifab/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home1/getdemo/public_html/Actifab/index.php on line 34
+[03-Feb-2026 11:53:41 UTC] PHP Warning:  require(/home1/getdemo/public_html/Actifab/../Actifab/vendor/autoload.php): Failed to open stream: No such file or directory in /home1/getdemo/public_html/Actifab/index.php on line 34
+[03-Feb-2026 11:53:41 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home1/getdemo/public_html/Actifab/../Actifab/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php83/root/usr/share/pear') in /home1/getdemo/public_html/Actifab/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home1/getdemo/public_html/Actifab/index.php on line 34
+[03-Feb-2026 12:04:18 UTC] PHP Parse error:  Unclosed '{' on line 16 in /home1/getdemo/Actifab/app/Helpers/helpers.php on line 72
+[03-Feb-2026 12:04:31 UTC] PHP Parse error:  Unclosed '{' on line 19 in /home1/getdemo/Actifab/app/Helpers/helpers.php on line 72
+[03-Feb-2026 12:04:46 UTC] PHP Parse error:  Unclosed '{' on line 22 in /home1/getdemo/Actifab/app/Helpers/helpers.php on line 72
+[18-Mar-2026 14:51:13 Asia/Kolkata] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in /home1/getdemo/Actifab/app/Exceptions/Handler.php on line 3
+[18-Mar-2026 14:51:25 Asia/Kolkata] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in /home1/getdemo/Actifab/app/Exceptions/Handler.php on line 3
+[18-Mar-2026 14:51:44 Asia/Kolkata] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in /home1/getdemo/Actifab/app/Exceptions/Handler.php on line 3
+[18-Mar-2026 14:51:47 Asia/Kolkata] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in /home1/getdemo/Actifab/app/Exceptions/Handler.php on line 3
+[18-Mar-2026 14:51:54 Asia/Kolkata] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in /home1/getdemo/Actifab/app/Exceptions/Handler.php on line 3
+[18-Mar-2026 14:51:57 Asia/Kolkata] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in /home1/getdemo/Actifab/app/Exceptions/Handler.php on line 3
+[18-Mar-2026 14:51:59 Asia/Kolkata] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in /home1/getdemo/Actifab/app/Exceptions/Handler.php on line 3
+[18-Mar-2026 14:52:03 Asia/Kolkata] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in /home1/getdemo/Actifab/app/Exceptions/Handler.php on line 3
+[17-Apr-2026 12:47:15 Asia/Kolkata] PHP Fatal error:  Trait "App\Http\Controllers\Admin\Illuminate\Validation\Rule" not found in /home1/getdemo/Actifab/app/Http/Controllers/Admin/FeederCategoryController.php on line 12
+[17-Apr-2026 12:47:20 Asia/Kolkata] PHP Fatal error:  Trait "App\Http\Controllers\Admin\Illuminate\Validation\Rule" not found in /home1/getdemo/Actifab/app/Http/Controllers/Admin/FeederCategoryController.php on line 12

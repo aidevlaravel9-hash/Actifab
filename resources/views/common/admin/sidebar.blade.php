@@ -19,10 +19,17 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#sidebarMore" data-bs-toggle="collapse" role="button"
                         aria-expanded="true" aria-controls="sidebarMore">
-                        <i class="fa fa-list text-white"></i> Master&nbsp;Entry </a>
+                        <i class="fa fa-list text-white"></i>Panel Master&nbsp; </a>
                     <div class="menu-dropdown collapse show" id="sidebarMore" style="">
                         <ul class="nav nav-sm flex-column">
 
+                            <li class="nav-item">
+                                <a href="{{ route('section.index') }}"
+                                    class="nav-link {{ request()->is('admin/section*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-list"></i>
+                                    Section Type
+                                </a>
+                            </li>
 
                             <li class="nav-item">
                                 <a href="{{ route('feeder-category.index') }}"
@@ -70,6 +77,20 @@
                                     Parts Master
                                 </a>
                             </li>
+
+
+
+
+
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#sidebarMore" data-bs-toggle="collapse" role="button"
+                        aria-expanded="true" aria-controls="sidebarMore">
+                        <i class="fa fa-list text-white"></i> Master&nbsp; Entry</a>
+                    <div class="menu-dropdown collapse show" id="sidebarMore" style="">
+                        <ul class="nav nav-sm flex-column">
 
                             <li class="nav-item">
                                 <a href="{{ route('system-rating.index') }}"
@@ -143,45 +164,39 @@
                                 </a>
                             </li>
 
+                            <li class="nav-item">
+                                <a href="{{ route('gland-plate-thickness.index') }}"
+                                    class="nav-link {{ request()->is('admin/gland-plate-thickness*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-border-style"></i>
+                                    Gland Plate Thickness
+                                </a>
+                            </li>
 
+                            <li class="nav-item">
+                                <a href="{{ route('outgoing-cable-position.index') }}"
+                                    class="nav-link {{ request()->is('admin/outgoing-cable-position*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-external-link-alt"></i>
+                                    Outgoing Cable Position
+                                </a>
+                            </li>
 
-                        </ul>
-                    </div>
-                </li>
+                            <li class="nav-item">
+                                <a href="{{ route('plinth-type.index') }}"
+                                    class="nav-link {{ request()->is('admin/plinth-type*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-border-style"></i>
+                                    Plinth Type
+                                </a>
+                            </li>
 
-                <li class="nav-item">
-                    <a href="{{ route('gland-plate-thickness.index') }}"
-                        class="nav-link {{ request()->is('admin/gland-plate-thickness*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-border-style"></i>
-                        Gland Plate Thickness
-                    </a>
-                </li>
+                            <li class="nav-item">
+                                <a href="{{ route('certification.index') }}"
+                                    class="nav-link {{ request()->is('admin/certification*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-certificate"></i>
+                                    Certification
+                                </a>
+                            </li>
 
-                <li class="nav-item">
-                    <a href="{{ route('outgoing-cable-position.index') }}"
-                        class="nav-link {{ request()->is('admin/outgoing-cable-position*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-external-link-alt"></i>
-                        Outgoing Cable Position
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{{ route('plinth-type.index') }}"
-                        class="nav-link {{ request()->is('admin/plinth-type*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-border-style"></i>
-                        Plinth Type
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{{ route('certification.index') }}"
-                        class="nav-link {{ request()->is('admin/certification*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-certificate"></i>
-                        Certification
-                    </a>
-                </li>
-
-                {{--  <li class="nav-item">
+                            {{--  <li class="nav-item">
                     <a href="{{ route('project.index') }}"
                         class="nav-link {{ request()->is('admin/project*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-project-diagram"></i>
@@ -189,7 +204,57 @@
                     </a>
                 </li>  --}}
 
-            </ul>
+                        </ul>
+
+
+                    </div>
+                </li>
+                
+                 <li class="nav-item">
+                    <a class="nav-link" href="#sidebarMore" data-bs-toggle="collapse" role="button"
+                        aria-expanded="true" aria-controls="sidebarMore">
+                        <i class="fa fa-list text-white"></i>Project Submit&nbsp; </a>
+                    <div class="menu-dropdown collapse show" id="sidebarMore" style="">
+                        <ul class="nav nav-sm flex-column">
+
+                            <li class="nav-item">
+                                <a href="{{ route('projects.inDevelopment') }}"
+                                    class="nav-link {{ request()->is('projects/in-development') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-list"></i>
+                                    In Development
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('projects.completed') }}"
+                                    class="nav-link {{ request()->is('projects/completed') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-list"></i>
+                                    Completed
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="#sidebarMore" data-bs-toggle="collapse" role="button"
+                        aria-expanded="true" aria-controls="sidebarMore">
+                        <i class="fa fa-list text-white"></i>User Management&nbsp; </a>
+                    <div class="menu-dropdown collapse show" id="sidebarMore" style="">
+                        <ul class="nav nav-sm flex-column">
+
+                            <li class="nav-item">
+                                <a href="{{ route('manager-designer-user.index') }}"
+                                    class="nav-link {{ request()->is('admin/manager-designer-user*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-list"></i>
+                                    Users
+                                </a>
+                            </li>
+
+                           
+                        </ul>
+                    </div>
+                </li>
         </div>
         <!-- Sidebar -->
     </div>
